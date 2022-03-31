@@ -1,0 +1,70 @@
+.html
+{
+	margin:0;
+	padding:0;
+}
+
+body 
+{
+	margin: 0;
+	padding: 0;
+}
+
+.title
+{
+	display: inline-block;
+	padding-left: 100px;
+}
+
+.bar li 
+{ 
+	display: inline-block;
+	float: left;
+	margin: 15px 15px;
+
+}
+
+.bar li a
+{
+	color: black;
+	text-decoration:none;
+	background: white;
+	outline: 2px solid #5b5a57;
+	padding: 10px 25px 10px 25px; 
+}
+
+.bar li a:hover
+{
+	color: #eae7dc;
+	background-color: #5b5a57;
+} 
+
+
+.head
+{
+	background-color: #F7DBD7;
+	min-height: 150px;
+	padding-bottom: 30px;
+}
+
+.timeline
+{
+	padding: 10px 30px;
+}
+
+.post
+{
+	text-align:center;
+	color: white;
+	padding:5px;
+	border-radius: 5px;
+}
+	
+
+input
+{
+  padding: 8px;
+  margin-top: 5px; 
+  margin-bottom: 10px;
+  border-radius: 3px; 
+}
