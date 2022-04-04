@@ -14,6 +14,8 @@ body
 {
 	display: inline-block;
 	padding-left: 100px;
+	text-align: center;
+
 }
 
 .bar li 
@@ -21,6 +23,8 @@ body
 	display: inline-block;
 	float: left;
 	margin: 15px 15px;
+	text-align: center;
+	align-items: center;
 
 }
 
@@ -44,6 +48,11 @@ body
 {
 	background-color: #F7DBD7;
 	min-height: 150px;
+	padding-bottom: 30px;
+}
+.head_login {
+	background-color: #F7DBD7;
+	min-height: 100px;
 	padding-bottom: 30px;
 }
 
