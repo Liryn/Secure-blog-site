@@ -37,17 +37,17 @@
          <!--  <form action="/homepage.html" method="post">-->
             <div class ="login-form">
                 <h1 class="mt-4">Welcome to our Blog</h1>
-              
-                <div class="container">
-                    <h2 class="mt-4">Please input your login details below:</h2><br>
-                  <label for="ecode"><b>Email</b></label>
-                  <input type="text" placeholder="Enter Email" name="email" required>
-                    <br>
-                    <label for="pword"><b>Password</b></label>
-                    <input type ="text" placeholder="Enter Password" name="password" required>                               
-                  <button class="btn btn-primary" button type="submit" onclick="document.location='homepage.html'"> Login</button>
-                </div>
-            </div>
+                
+                <form name="loginForm" action="/" onsubmit="return validateForm()"> <!-- SQL page link here?-->
+            
+                  <label for="email">Email:</label><br>
+                  <input type="text" id="email" name="email"><br><br>
+                  
+                  <label for="password">Password:</label><br>
+                  <input type="text" id="password" name="password"><br><br>
+                  <input type="submit" value="Login">
+                </form> 
+                
 
             <br><br><br><br><br><br>
              <!-- </form>-->

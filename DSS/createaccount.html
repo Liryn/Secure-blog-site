@@ -35,23 +35,23 @@
 	</div>
             
            
-            </div>
+</div>
+<br><br>
  <!--  <form action="/homepage.html" method="post">-->
     <div class ="login-form"> 
         <div class="container">
-            <h2 class="mt-4">Please input your details below:</h2><br>
-          <label for="fname"><b>Firstname</b></label>
-          <input type="text" placeholder="Enter Firstname" name="fname" required>
-          <br>
-      
-           <label for="sname"><b>Surname</b></label>
-          <input type="text" placeholder="Enter Surname" name="sname" required>
-            <br>
-          <label for="pcode"><b>Email</b></label>
-          <input type="text" placeholder="Enter Email" name="email" required>
-            <br>
-        
-          <button class="btn btn-primary" button type="submit" onclick="document.location='homepage.html'"> Register</button>
+          <form name="createAccountForm" action="/"> <!-- SQL LINK HERE?-->
+            <label for="fname">First name:</label><br>
+            <input type="text" id="fname" name="fname" ><br>
+            
+            <label for="lname">Last name:</label><br>
+            <input type="text" id="lname" name="lname" ><br><br>
+
+            <label for="email">Email:</label><br>
+            <input type="text" id="email" name="email"><br><br>
+
+            <input type="submit" value="Submit">
+          </form> 
         </div>
     </div>
 
