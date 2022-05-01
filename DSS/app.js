@@ -20,6 +20,9 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', 'ejs');
 
+app.use(express.static('css'));
+app.use(express.urlencoded({ extended: true}))
+
 // app.get('/createdata', (req, res) =>{
 //     let sql = 'CREATE DATABASE nodemysql';
 //     data.query(sql, (err, result) =>{
@@ -30,12 +33,13 @@ app.set('views', 'ejs');
 
 app.listen(3000);
 
+const blogs = [
+    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
+    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
+    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
+];
+
 app.get('/homepage', (req, res) => {
-    const blogs = [
-        {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-        {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-        {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-    ];
     res.render('homepage', {blogs});
 });
 
@@ -59,15 +63,13 @@ app.get('/settings', (req, res) => {
     res.render('settings')
 });
 
-app.use(express.static('css'));
-app.use(express.urlencoded({ extended: true}))
-
-// app.post('/homepage', (req, res) =>{
-//     const blog = new Blog(req.body);
-//     blog.save()
-//         .then((result) =>{
-//             res.redirect('/homepage');
-//         })
-//         .catch((err) =>{
-//             console.log(err);
-//         })   });
+app.post('/homepage', (req, res) =>{
+    const blog = req.body;
+    blogs.push(blog)
+        // .then((result) =>{
+        //     res.redirect('/homepage');
+        // })
+        // .catch((err) =>{
+        //     console.log(err);
+        // })   
+    });
