@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+		<title> OUR ONLINE BLOG - Homepage</title>
+		<link rel="" type="" href="">
+		<link type = "text/css" rel="stylesheet" href="style.css">
+	</head>
+	
+	<body>
+	<div class="head">
+	
+		<div class="title">
+				<h1>OUR ONLINE BLOG</h1>
+			</div>
+	
+			<div class ="navbar">
+                <nav>
+                    <ul class="bar">
+                        <li><a href="/homepage">Home</a></li>
+                        <li><a href="/makepost">Make Post</a></li>
+                        <li><a href="/settings">Settings</a></li>
+                        <li><a href="/myprofile">My Profile</a></li>
+                        <li><a href="/login"> Log In</a></li>
+                        <li><a href="/createaccount"> Register</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+	
+	<div class = "timeline">
+		<h1>BLOG TIMELINE</h1>
+
+        <% if(blogs.length > 0){ %>
+            <% blogs.forEach(blog => { %>
+            <div class = blogpost>
+                <h1 class = "title"><%= blog.title %> </h2>
+                <p class = "content"><%=blog.content %> </p>
+            </div>
+            <% }) %>
+        <% } %>
+	
+	
+	
+	
+	
+	</body>
+</html>
+
+	
