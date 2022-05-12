@@ -34,14 +34,9 @@ app.use(express.json())
 
 app.listen(3000);
 
-const blogs = [
-    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-    {title: 'SAMPLE TITLE', content: 'SAMPLE WORDS'},
-];
-
 app.get('/homepage', (req, res) => {
-    res.render('homepage', {blogs});
+    // const blogs = database.query("SELECT * FROM Blogs")
+    res.render('homepage');
 });
 
 app.get('/login', (req, res) => {
@@ -77,6 +72,25 @@ app.get('/settings', (req, res) => {
 //         })   
 //     });
 
+
+app.post('/homepage', async (req, res) => {
+    try {
+        const {title, content} = req.body;
+        console.log(req.body)
+        database.query("INSERT INTO Blogs SET ?", {title: title, content: content}), (err, res) =>{
+            if(err){
+                console.log(err);
+            } else {
+                res.redirect('/homepage')
+                console.log(res)
+            }
+        }
+    } 
+    catch(err) {
+        console.log(err);
+    }
+});  
+
 app.post('/login', async (req, res) => {
     try {
         const {email, password} = req.body;
@@ -100,12 +114,11 @@ app.post('/createaccount', async (req, res) => {
         const {fname, lname, email, password} = req.body;
         console.log(req.body)
 
-        const hash = await bcrypt.hash(password, 8);
+        // const hash = await bcrypt.hash(password, 8);
         
-        // const hash = await genSalt().then(salt => {
-        //     bcrypt.hash(password, salt);
-        // });
-
+        const salt = await bcrypt.genSalt();
+        console.log(salt)
+        const hash = await bcrypt.hash(password, salt);
         console.log(hash);
 
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
@@ -119,7 +132,7 @@ app.post('/createaccount', async (req, res) => {
     catch(err) {
         console.log(err);
     }
-});   
+}); 
 
 // bcrypt.genSalt(12).then(salt => { // Arg is the length of running operation (Salt Rounds). Higher equals more secure, but takes more time.
 //     bcrypt.hash("password", salt).then(hash => {
