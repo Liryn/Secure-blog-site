@@ -114,24 +114,24 @@ app.post('/createaccount', async (req, res) => {
         const {fname, lname, email, password} = req.body;
         console.log(req.body)
 
-        // const hash = await bcrypt.hash(password, 8);
+    // const hash = await bcrypt.genSalt(12).then(salt => { // Arg is the length of running operation
+    //     bcrypt.hash("password", salt)
+    // });
         
         const salt = await bcrypt.genSalt();
-        console.log(salt)
         const hash = await bcrypt.hash(password, salt);
-        console.log(hash);
-
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
             if(err){
                 console.log(err);
             } else {
-                console.log(res)
+                console.log(res);
             }
         }
     } 
     catch(err) {
         console.log(err);
     }
+    res.redirect('/homepage');
 }); 
 
 // bcrypt.genSalt(12).then(salt => { // Arg is the length of running operation (Salt Rounds). Higher equals more secure, but takes more time.
