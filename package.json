@@ -1,0 +1,22 @@
+{
+  "name": "freedb",
+  "version": "1.0.0",
+  "description": "Testing - Sam's branch commit",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liryn/Secure-blog-site.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Liryn/Secure-blog-site/issues"
+  },
+  "homepage": "https://github.com/Liryn/Secure-blog-site#readme",
+  "dependencies": {
+    "mysql2": "^2.3.3"
+  }
+}
