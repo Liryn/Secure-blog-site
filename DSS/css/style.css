@@ -75,3 +75,25 @@ input
   margin-bottom: 10px;
   border-radius: 3px; 
 }
+
+.title
+{
+	text-align: center;
+	padding:5px;
+	border-radius: 5px;
+}
+
+.content
+{
+	padding: 10px;
+	border-radius: 5px;
+}
+
+.blogpost{
+
+	text-align:center;
+	padding:5px;
+	border-radius: 5px;
+	border-style: solid;
+	border-color: black;
+}
