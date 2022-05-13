@@ -1,19 +1,18 @@
 const express = require('express');
 const mysql = require('mysql');
 const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
+
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 
-// const blog = require('./models/blog');
-// const { redirect } = require('express/lib/response');
-// const res = require('express/lib/response');
-// const blog = require('./models/blog');
+dotenv.config({path: './db.env'});
 
 const database = mysql.createConnection({
-        host: "sql4.freesqldatabase.com", 
-        user: "sql4491086", 
-        password: "k6TrSsVcap", 
-        database: "sql4491086",
-        port: 3306,
+        host: process.env.DB_HOST, 
+        user: process.env.DB_USER, 
+        password: process.env.DB_PASS, 
+        database: process.env.DB,
+        port: process.env.DB_PORT
 });
 
 database.connect((err) => {
@@ -35,7 +34,6 @@ app.use(express.json())
 app.listen(3000);
 
 app.get('/homepage', (req, res) => {
-    // const blogs = database.query("SELECT * FROM Blogs")
     res.render('homepage');
 });
 
@@ -61,23 +59,11 @@ app.get('/settings', (req, res) => {
     });
 });
 
-// app.post('/homepage', (req, res) =>{
-//     const blog = new blog(req.body);
-//     blog.save()
-//         .then((result) =>{
-//             res.redirect('/homepage');
-//         })
-//         .catch((err) =>{
-//             console.log(err);
-//         })   
-//     });
-
-
 app.post('/homepage', async (req, res) => {
     try {
         const {title, content} = req.body;
         console.log(req.body)
-        database.query("INSERT INTO Blogs SET ?", {title: title, content: content}), (err, res) =>{
+        database.query("INSERT INTO Blogs SET ?", {title: title, content: content}), (err, res) => {
             if(err){
                 console.log(err);
             } else {
@@ -89,19 +75,35 @@ app.post('/homepage', async (req, res) => {
     catch(err) {
         console.log(err);
     }
-});  
+});
 
 app.post('/login', async (req, res) => {
     try {
         const {email, password} = req.body;
-        const user = await database('Users').first('*').where({email: email});
+        const user = database.query("SELECT email FROM Users WHERE email = ?", [email], (err, res) => {
+            if(err) {
+                console.log(err)
+            } else {
+                console.log(res)
+            }
+        })
+        
         if(user) {
-            const pass = await bcrypt.compare(password, user.hash);
+            const hash = database.query("SELECT password FROM Users WHERE email = ?", [email], (err, res) => {
+                if(err) {
+                    console.log(err)
+                } else {
+                    console.log(res)
+                }
+            })
+            const pass = bcrypt.compare(password, hash);
             if(pass) {
                 console.log('Valid credentials!');
+                res.redirect('/homepage')
             }
             else {
                 console.log('Invalid credentials')
+                res.redirect('/createaccount')
             }
         }
     } catch(err){
@@ -114,29 +116,31 @@ app.post('/createaccount', async (req, res) => {
         const {fname, lname, email, password} = req.body;
         console.log(req.body)
 
-    // const hash = await bcrypt.genSalt(12).then(salt => { // Arg is the length of running operation
-    //     bcrypt.hash("password", salt)
-    // });
-        
+        database.query("SELECT email FROM Users WHERE email = ?", [email], (err, res) => {
+            if(err) {
+                console.log(err)
+            } else if(res.length > 0) {
+                console.log('email in use')
+                // Find way to cancel process
+            }
+        })
+                 
+        // const hash = await bcrypt.hash(password, 8);
+
         const salt = await bcrypt.genSalt();
         const hash = await bcrypt.hash(password, salt);
+
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
             if(err){
                 console.log(err);
             } else {
                 console.log(res);
+                }
             }
-        }
+        console.log("REGISTERED");
+        res.redirect('/login');
     } 
     catch(err) {
         console.log(err);
     }
-    res.redirect('/homepage');
 }); 
-
-// bcrypt.genSalt(12).then(salt => { // Arg is the length of running operation (Salt Rounds). Higher equals more secure, but takes more time.
-//     bcrypt.hash("password", salt).then(hash => {
-//         // Store in password DB
-//         bcrypt.compare("password", hash).then(result => console.log(result));
-//     });
-// })
