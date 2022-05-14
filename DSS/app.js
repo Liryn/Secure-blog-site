@@ -77,44 +77,46 @@ app.post('/homepage', async (req, res) => {
     }
 });
 
+
 app.post('/login', async (req, res) => {
 
-        try {
+    try {
 
-            const {email, password} = req.body;
+        const {email, password} = req.body;
 
-            if(!email){
-                console.log('missing email')
-            } else if(!password){
-                console.log('missing password')
-            }
+        if(!email){
+            console.log('missing email')
+        } else if(!password){
+            console.log('missing password')
+        }
 
-            const hash = database.query("SELECT password FROM Users WHERE email = ?", [email]) 
+        const hash = database.query("SELECT password FROM Users WHERE email = ?", [email]) 
 
-            if(!hash){
-                console.log('no entry in database')
-            }
+        if(hash){
 
-            else if(hash){
-
-            const check = async (password, hash) => {
-                return await bcrypt.compare(password, hash), (err, res) => {
-                    if(res == true){
-                        console.log('nice')
-                    } else {
-                        console.log('long')
-                    }
+        const check = async (password, hash) => {
+            return await bcrypt.compare(password, hash), (err, res) => {
+                if(res == true){
+                    console.log('nice')
+                } else {
+                    console.log('long')
                 }
             }
-                     
-                if(check){
-                res.redirect('/makepost')
-                }
+        }
+            if(check == false){
+                console.log('valid');
+                res.redirect('/makepost');
             }
+            else {
+                console.log('invalid');
+            }
+        } else {
+            console.log('no user found');
+        }
 
-    } catch(err){
-        console.log(err);
-    }
+} catch(err){
+    console.log(err);
+}
 });
 
 app.post('/createaccount', async (req, res) => {
