@@ -78,34 +78,40 @@ app.post('/homepage', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    try {
-        const {email, password} = req.body;
-        const user = database.query("SELECT email FROM Users WHERE email = ?", [email], (err, res) => {
-            if(err) {
-                console.log(err)
-            } else {
-                console.log(res)
+
+        try {
+
+            const {email, password} = req.body;
+
+            if(!email){
+                console.log('missing email')
+            } else if(!password){
+                console.log('missing password')
             }
-        })
-        
-        if(user) {
-            const hash = database.query("SELECT password FROM Users WHERE email = ?", [email], (err, res) => {
-                if(err) {
-                    console.log(err)
-                } else {
-                    console.log(res)
+
+            const hash = database.query("SELECT password FROM Users WHERE email = ?", [email]) 
+
+            if(!hash){
+                console.log('no entry in database')
+            }
+
+            else if(hash){
+
+            const check = async (password, hash) => {
+                return await bcrypt.compare(password, hash), (err, res) => {
+                    if(res == true){
+                        console.log('nice')
+                    } else {
+                        console.log('long')
+                    }
                 }
-            })
-            const pass = bcrypt.compare(password, hash);
-            if(pass) {
-                console.log('Valid credentials!');
-                res.redirect('/homepage')
             }
-            else {
-                console.log('Invalid credentials')
-                res.redirect('/createaccount')
+                     
+                if(check){
+                res.redirect('/makepost')
+                }
             }
-        }
+
     } catch(err){
         console.log(err);
     }
@@ -114,21 +120,21 @@ app.post('/login', async (req, res) => {
 app.post('/createaccount', async (req, res) => {
     try {
         const {fname, lname, email, password} = req.body;
-        console.log(req.body)
 
         database.query("SELECT email FROM Users WHERE email = ?", [email], (err, res) => {
             if(err) {
                 console.log(err)
             } else if(res.length > 0) {
-                console.log('email in use')
+                console.log('Email in Use')
                 // Find way to cancel process
             }
         })
-                 
-        // const hash = await bcrypt.hash(password, 8);
 
-        const salt = await bcrypt.genSalt();
-        const hash = await bcrypt.hash(password, salt);
+        if(password < 8){
+            // find way to cancel process as per NIST convention
+        }
+
+        const hash = await bcrypt.hash(password, 10); // generates salt
 
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
             if(err){
