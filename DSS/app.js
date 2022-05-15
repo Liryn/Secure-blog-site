@@ -2,7 +2,6 @@ const express = require('express');
 const mysql = require('mysql');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
-const JSON = require('JSON');
 
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 
@@ -124,19 +123,12 @@ app.post('/createaccount', async (req, res) => {
     try {
         const {fname, lname, email, password} = req.body;
 
-        // Get all emails in the database
-        database.query("SELECT email FROM Users", (err, res) => {
+        database.query("SELECT email FROM Users WHERE email = ?", [email], (err, res) => {
             if(err) {
-                console.log(err);
-			} 
-			// Check if the user table is empty
-			else if(res.length > 0) {				
-				// Turn the res array of emails to one large string, check if the email has an index in the string, if so, it's present
-				if(JSON.stringify(res).indexOf(email) >= 0){
-					console.log("Index is", JSON.stringify(res).indexOf(email));
-					console.log('Email in Use, has been found with the index checker');
-				}
-					// Find way to cancel process,
+                console.log(err)
+            } else if(res.length > 0) {
+                console.log('Email in Use')
+                // Find way to cancel process
             }
         })
 
