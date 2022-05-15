@@ -78,7 +78,6 @@ app.post('/homepage', async (req, res) => {
     }
 });
 
-
 app.post('/login', async (req, res) => {
 
     try {
@@ -104,7 +103,7 @@ app.post('/login', async (req, res) => {
                 }
             }
         }
-            if(check == false){
+            if(check == true){
                 console.log('valid');
                 res.redirect('/makepost');
             }
