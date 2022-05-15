@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const JSON = require('JSON');
 
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 
