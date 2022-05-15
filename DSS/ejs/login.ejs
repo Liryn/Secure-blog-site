@@ -33,10 +33,9 @@
            
             </div>
          <!--  <form action="/homepage.html" method="post">-->
-          <div class ="login-form">
-            <h1 class="mt-4">Welcome to our Blog</h1>
-            
-            <form name="loginForm" action="/" onsubmit="return validateForm()"> <!-- SQL page link here?-->
+          <div class ="login-form"> 
+            <div class="container">
+            <form name="loginForm" action="/login" method="POST">
         
               <label for="email">Email:</label><br>
               <input type="text" id="email" name="email"><br><br>
@@ -45,6 +44,8 @@
               <input type="text" id="password" name="password"><br><br>
               <input type="submit" value="Login">
             </form> 
+            </div>
+          </div>
 
             <br><br><br><br><br><br>
              <!-- </form>-->
