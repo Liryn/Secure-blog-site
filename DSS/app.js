@@ -36,25 +36,11 @@ app.use(express.json());
 app.listen(3000);
 
 app.get('/homepage', (req, res) => {
-    res.render('homepage');
-    let blogArray = [];
-    const blog = database.query("SELECT * FROM Blogs", (err, res) => {
+    const blogs = database.query("SELECT * FROM Blogs", (err, blog) => {
         if(err){
             console.log(err);
         } else {
-            // console.log(res);
-            for (let i = 0; i < res.length; i++){
-                //Change name of blogstuff
-                var blogListing = [];
-                var blogstuff = JSON.stringify(res[i])
-                var postID = (blogstuff.slice(blogstuff.indexOf("PostID")+8,blogstuff.indexOf("title")-2))
-                var title = (blogstuff.slice(blogstuff.indexOf("title")+8,blogstuff.indexOf("content")-3))
-                var content = (blogstuff.slice(blogstuff.indexOf("content")+10,blogstuff.indexOf("UserID")-3))
-                var userID = (blogstuff.slice(blogstuff.indexOf("UserID")+8,blogstuff.indexOf("}")))
-                blogListing.push(postID,title,content,userID)
-                blogArray.push(blogListing)
-            }
-            console.log(blogArray)
+            res.render('homepage', {blog});
         }
     });
 });
@@ -115,7 +101,7 @@ app.post('/login', async (req, res) => {
         console.log(hash);
 
         if(hash){
-            // const check = await bcrypt.compare(password, hash)
+            const check = await bcrypt.compare(password, hash)
         
             // if(check == true){
             //     console.log('valid');
@@ -145,14 +131,15 @@ app.post('/createaccount', async (req, res) => {
 			} 
 			// Check if the user table is empty
 			else if(res.length > 0) {
-            console.log('email in use');
+            console.log('There are emails');
             
 				// Turn the res array of emails to one large string, check if the email has an index in the string, if so, it's present
 				if(JSON.stringify(res).indexOf(email) >= 0){
 					console.log("Index is", JSON.stringify(res).indexOf(email));
 					console.log('Email in Use, has been found with the index checker');
-				}
-					// Find way to cancel process
+				} 
+
+                // Find way to cancel process
             }
         })
 
