@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const JSON = require('JSON');
 
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
-const { indexOf } = require('lodash');
+const { indexOf, join } = require('lodash');
 
 dotenv.config({path: './db.env'});
 
@@ -91,34 +91,41 @@ app.post('/login', async (req, res) => {
     try {
         const {email, password} = req.body;
 
-        if(!email){
-            console.log('missing email')
-        } else if(!password){
-            console.log('missing password')
-        }
-
-        const hash = database.query("SELECT password FROM Users WHERE email = ? LIMIT 1", [email])
-        console.log(hash);
-
-        if(hash){
-            const check = await bcrypt.compare(password, hash)
+        const user = database.query("SELECT password FROM Users WHERE email = ?", [email], (err, res) => {
+            if(err){
+                console.log(err)
+            }
+            else{
+                console.log(res);
+            }
+        });
         
-            // if(check == true){
-            //     console.log('valid');
-            //     res.redirect('/makepost');
-            // }
-            // else {
-            //     console.log('invalid');
-            // }
+        if(user){
+            let check = await bcrypt.compare(password, user.password)
+        
+            if(check){
+                console.log('valid');
+                res.redirect('/makepost');
+            }
+            else {
+                console.log('invalid');
+            }
         } else {
-            console.log('no user found');
+            console.log('no email');
         }
 
-
-} catch(err){
+    } catch(err){
     console.log(err);
-}
+    }
 });
+
+// log = async function(email, password){
+//     const user = await database.query('')
+//     if(user){
+//         await bcrypt.compare(password, user.password);
+//     }
+//     throw Error('Incorrect Email')
+// }
 
 app.post('/createaccount', async (req, res) => {
     try {
@@ -147,7 +154,7 @@ app.post('/createaccount', async (req, res) => {
             // find way to cancel process as per NIST convention
         }
 
-        const salt = await bcrypt.genSalt(); // Generate salt
+        const salt = await bcrypt.genSaltSync(10); // Generate salt
         const hash = await bcrypt.hash(password, salt); // Generate hash
 
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
