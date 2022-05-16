@@ -34,8 +34,13 @@
 	
 	<div class ="post">
 		<form action = "/homepage" method="POST">
-			<input name="title" type="text" placeholder="Post Title:" required><br>
-			<textarea name="content" rows = "5" cols = "40" placeholder="Write your Post" required></textarea><br>
+			<h4>(*) Required Fields</h4>
+			<label for="title">Blog Title *</label><br>
+			<input name="title" type="text" required><br>
+			<label for="content">Blog Content *</label><br>
+			<textarea name="content" rows = "5" cols = "40" placeholder='Type content here' required></textarea><br>
+			<label for="userid">User ID *</label><br>
+			<input name="userid" type="text" required><br>
 			<input type="submit" class="form-control submit" value="Make Post">
 		</form>
 	</div>

@@ -34,6 +34,15 @@
 	
 	<div class = "timeline">
 		<h1>BLOG TIMELINE</h1>
+    </div>
+
+    <% blog.forEach(blog => { %>
+    <div class = 'blogpost'>
+        <h1 class = 'btitle'><%= blog.title %></h1>
+        <p class = 'heading'>User ID: <%= blog.UserID %> <br>Post ID: <%= blog.PostID %></p>
+        <p class = 'content'><%= blog.content %></p>
+    </div>
+    <% }) %>
 	
 	</body>
 </html>

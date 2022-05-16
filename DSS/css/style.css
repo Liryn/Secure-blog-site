@@ -56,13 +56,11 @@ body
 
 .timeline
 {
-	padding: 10px 30px;
+	padding: 10px 50px;
 }
 
 .post
 {
-	text-align:center;
-	color: white;
 	padding:5px;
 	border-radius: 5px;
 }
@@ -76,24 +74,32 @@ input
   border-radius: 3px; 
 }
 
-.title
+.btitle
 {
-	text-align: center;
-	padding:5px;
 	border-radius: 5px;
+	float: left;
 }
 
 .content
 {
-	padding: 10px;
-	border-radius: 5px;
+	padding: 5px;
+	float: left;
+}
+
+.heading
+{
+	float: right;
+	padding-right: 10px;
 }
 
 .blogpost{
-
-	text-align:center;
-	padding:5px;
 	border-radius: 5px;
 	border-style: solid;
 	border-color: black;
+	height: 40%;
+	width: 20%;
+	margin: 10px;
+	padding-left: 50px;
+	padding-bottom: 100px;
 }
+

@@ -31,17 +31,18 @@
       </div>
     </div>
            
-            </div>
-         <!--  <form action="/homepage.html" method="post">-->
+    </div>
           <div class ="login-form"> 
             <div class="container">
             <form name="loginForm" action="/login" method="POST">
+
+              <h4>(*) Required Fields</h4>
         
-              <label for="email">Email:</label><br>
-              <input type="text" id="email" name="email"><br><br>
+              <label for="email">Email: *</label><br>
+              <input type="text" id="email" name="email" required><br><br>
               
-              <label for="password">Password:</label><br>
-              <input type="text" id="password" name="password"><br><br>
+              <label for="password">Password: *</label><br>
+              <input type="text" id="password" name="password" required><br><br>
               <input type="submit" value="Login">
             </form> 
             </div>
