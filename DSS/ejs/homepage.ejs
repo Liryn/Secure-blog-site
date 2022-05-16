@@ -12,37 +12,34 @@
 	</head>
 	
 	<body>
-	<div class="head">
-	
-		<div class="title">
-				<h1>OUR ONLINE BLOG</h1>
+		<div class="header">
+		
+			<div class="title">
+				<h1>Our Online Blog</h1>
 			</div>
-	
-			<div class ="navbar">
-                <nav>
-                    <ul class="bar">
-                        <li><a href="/homepage">Home</a></li>
-                        <li><a href="/makepost">Make Post</a></li>
-                        <li><a href="/settings">Settings</a></li>
-                        <li><a href="/myprofile">My Profile</a></li>
-                        <li><a href="/login"> Log In</a></li>
-                        <li><a href="/createaccount"> Register</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-	
-	<div class = "timeline">
-		<h1>BLOG TIMELINE</h1>
-    </div>
+		
+			<div class="navbar">
+				<a class = "active" href="/homepage">Home</a>
+				<a href="/makepost">Make Post</a>
+				<a href="/settings">Settings</a>
+				<a href="/myprofile">My Profile</a>
+				<a href="/login"> Log In</a>
+				<a href="/createaccount"> Register</a>
+			</div>
+		</div>
+		
+		<div class = "pageTitle">
+			<h1>Blog Timeline</h1>
+		</div>
 
-    <% blog.forEach(blog => { %>
-    <div class = 'blogpost'>
-        <h1 class = 'btitle'><%= blog.title %></h1>
-        <p class = 'heading'>User ID: <%= blog.UserID %> <br>Post ID: <%= blog.PostID %></p>
-        <p class = 'content'><%= blog.content %></p>
-    </div>
-    <% }) %>
+		<% blog.forEach(blog => { %>
+		<div class = 'blogList'>
+			<h1 class = 'blogTitle'><%= blog.title %></h1>
+			<p class = 'blogIDs'>User ID: <%= blog.UserID %> 
+			<p class = 'blogIDs'>Post ID: <%= blog.PostID %>
+			<p class = 'blogContent'><%= blog.content %></p>
+		</div>
+		<% }) %>
 	
 	</body>
 </html>

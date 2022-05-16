@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang= "en">
+<html lang="en">
+
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
@@ -11,41 +12,38 @@
 	</head>
 	
 	<body>
-	<div class="head">
-	
-		<div class="title">
+		<div class="header">
+		
+			<div class="title">
 				<h1>Create  A Post</h1>
-        </div>
-		
-            <div class ="navbar">
-                <nav>
-                    <ul class="bar">
-                        <li><a href="/homepage">Home</a></li>
-                        <li><a href="/makepost">Make Post</a></li>
-                        <li><a href="/settings">Settings</a></li>
-                        <li><a href="/myprofile">My Profile</a></li>
-                        <li><a href="/login"> Log In</a></li>
-                        <li><a href="/createaccount"> Register</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-
-	
-	<div class ="post">
-		<form action = "/homepage" method="POST">
-			<h4>(*) Required Fields</h4>
-			<label for="title">Blog Title *</label><br>
-			<input name="title" type="text" required><br>
-			<label for="content">Blog Content *</label><br>
-			<textarea name="content" rows = "5" cols = "40" placeholder='Type content here' required></textarea><br>
-			<label for="userid">User ID *</label><br>
-			<input name="userid" type="text" required><br>
-			<input type="submit" class="form-control submit" value="Make Post">
-		</form>
-	</div>
-		
-		
+			</div>
 			
+			<div class="navbar">
+				<a href="/homepage">Home</a>
+				<a class = "active" href="/makepost">Make Post</a>
+				<a href="/settings">Settings</a>
+				<a href="/myprofile">My Profile</a>
+				<a href="/login"> Log In</a>
+				<a href="/createaccount"> Register</a>
+			</div>
+		</div>
+
+		
+		<div class ="post">
+			<form action = "/homepage" method="POST">
+				<h4>(*) Required Fields</h4>
+				
+				<label for="title">Blog Title *</label>
+				<input name="title" type="text" required>
+				
+				<label for="content">Blog Content *</label>
+				<textarea name="content" rows = "5" cols = "40" placeholder='Type here...' required></textarea>
+				
+				<label for="userid">User ID *</label>
+				<input name="userid" type="text" required>
+				
+				<input type="submit" class="form-control submit" value="Make Post">
+			</form>
+		</div>	
 	</body>
 </html>

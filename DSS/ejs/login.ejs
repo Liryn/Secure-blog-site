@@ -1,57 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 	<head>
 		<meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-			<title> OUR ONLINE BLOG - Login </title>
-			<link rel="" type="" href="">
-			<link rel="stylesheet" href="style.css">
+		<title> OUR ONLINE BLOG - Login </title>
+		<link rel="" type="" href="">
+		<link rel="stylesheet" href="style.css">
     </head>
 
     <body>
-        <div class="head">
+        <div class="header">
 		
             <div class="title">
 				<h1>Login</h1>
 			</div>
 		
-      <div class ="navbar">
-        <nav>
-          <ul class="bar">
-            <li><a href="/homepage">Home</a></li>
-            <li><a href="/makepost">Make Post</a></li>
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/myprofile">My Profile</a></li>
-            <li><a href="/login"> Log In</a></li>
-            <li><a href="/createaccount"> Register</a></li>
-          </ul>
-        </nav>
-      </div>
-    </div>
+			<div class="navbar">
+				<a href="/homepage">Home</a>
+				<a href="/makepost">Make Post</a>
+				<a href="/settings">Settings</a>
+				<a href="/myprofile">My Profile</a>
+				<a class = "active" href="/login"> Log In</a>
+				<a href="/createaccount"> Register</a>
+			</div>
+		</div>
            
-    </div>
-          <div class ="login-form"> 
-            <div class="container">
-            <form name="loginForm" action="/login" method="POST">
+		<div class ="post"> 
+			<form name="loginForm" action="/login" method="POST">
 
-              <h4>(*) Required Fields</h4>
-        
-              <label for="email">Email: *</label><br>
-              <input type="text" id="email" name="email" required><br><br>
-              
-              <label for="password">Password: *</label><br>
-              <input type="text" id="password" name="password" required><br><br>
-              <input type="submit" value="Login">
-            </form> 
-            </div>
-          </div>
+				<h4>(*) Required Fields</h4>
 
-            <br><br><br><br><br><br>
-             <!-- </form>-->
+				<label for="email">Email: *</label>
+				<input type="text" id="email" name="email" required>
 
-        </body>
-        </html>
+				<label for="password">Password: *</label><br>
+				<input type="text" id="password" name="password" required>
+				<input type="submit" value="Login">
+			</form> 
+
+		</div>
+	</body>
+</html>
     
 	
