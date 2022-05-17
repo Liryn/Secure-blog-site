@@ -97,34 +97,39 @@ app.post('/login', async (req, res) => {
     
     try {
         const {email, password} = req.body;
+		
+		const sql =`SELECT password FROM Users WHERE email = '${email}' LIMIT 1`;
+		
+		var hash;
+		
+		function getPassword(callback) {
+			database.query(sql, (err, databaseHash) => {
+				if(err){
+					console.log(err);
+				}
+				else{
+					hash = databaseHash
+					console.log("This is res", databaseHash)
+					callback();
+				}
+			});
+		}
+		
+		function compareHash() {
+			stringPassword = JSON.stringify(hash)
+			hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
+			
+			console.log("The compare hash function is printing: ", hashedPassword);
+			console.log("The password the user passed in is: ", password);
+			if(password == hashedPassword){
+				console.log(hash,"IS EQUAL TO",password);
+		}}
 
-        // getU(email, async (err,res) => {
-        //     if (err) {
-        //         console.log(err);
-        //         return done(null, false, { message: err });
-        
-        //       } else {
-        //         const user = res;
-        //         // result will now return the user object!
-        //       }
-        // })
-
-        const sql = `SELECT password FROM Users WHERE email = '${email}' LIMIT 1`;
-
-        const user = database.query(sql, (err, res) => {
-            if(err){
-                console.log(err);
-            }
-            else{
-                console.log(res);
-            }
-        });
-
-        console.log(user);
+        //console.log(user);
 
         // const user = await bcrypt.hash('1', 10);
 
-        if(user){
+        /*if(user){
             const check = await bcrypt.compare(password, user.password);
         
             if(check){
@@ -136,9 +141,10 @@ app.post('/login', async (req, res) => {
             }
         } else {
             console.log('no email');
-        }
-
-    } catch(err){
+        }*/
+		getPassword(compareHash);
+    }
+	catch(err){
     console.log(err);
     }
 });
