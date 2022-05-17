@@ -69,9 +69,7 @@ app.get('/myprofile', (req, res) => {
 });
 
 app.get('/settings', (req, res) => {
-    const users = database.query('SELECT * FROM Users', (err, users) => {
-    res.render('settings', users)
-    });
+    res.render('settings');
 });
 
 app.post('/homepage', async (req, res) => {
@@ -114,18 +112,20 @@ app.post('/login', async (req, res) => {
 			});
 		}
 		
-		function compareHash() {
+		async function compareHash() {
 			stringPassword = JSON.stringify(hash)
 			hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
 			
 			console.log("The hashed function from the database is: ", hashedPassword);
 			console.log("The password the user passed in is: ", password);
 				
-			const hashComparison = bcrypt.compare(password, hashedPassword);	
+			const hashComparison = await bcrypt.compare(password, hashedPassword);	
+
+            console.log(hashComparison);
 			
 			if(hashComparison){
                 console.log('Bcrypt says the passwords match');
-                res.redirect('/makepost');
+                res.redirect('/myprofile');
             }
             else {
                 console.log('Bcrypt says the passwords do not match');
@@ -137,10 +137,6 @@ app.post('/login', async (req, res) => {
     console.log(err);
     }
 });
-
-log = function(email){
-
-}
 
 app.post('/createaccount', async (req, res) => {
     try {
