@@ -9,6 +9,7 @@ const { indexOf, join } = require('lodash');
 
 var escapeHtml = require('escape-html')
 var session = require('express-session')
+var alert = require('alert');
 
 dotenv.config({path: './db.env'});
 
@@ -231,7 +232,7 @@ app.post('/createaccount', async (req, res) => {
 				console.log("Process of making account is ending, account should not have been added")
 				//Refresh the create accoun page to clear boxes
 				res.render('createaccount')
-				//****Put Alert to client side here****
+
 				alert('That email has already been registered, please try again')
 				//End the post
 				res.end()
