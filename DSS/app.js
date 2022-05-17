@@ -4,9 +4,11 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const JSON = require('JSON');
 const bodyParser = require('body-parser');
-
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 const { indexOf, join } = require('lodash');
+
+var escapeHtml = require('escape-html')
+var session = require('express-session')
 
 dotenv.config({path: './db.env'});
 
@@ -35,6 +37,22 @@ app.use(bodyParser.urlencoded({ extended: false}));
 app.use(bodyParser.json());
 
 app.listen(3000);
+
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+  }))
+
+  function isAuthenticated (req, res, next) {
+    if (req.session.user) next()
+    else next('route')
+  }
+  app.get('/', isAuthenticated, function (req, res) {
+    // this is only called when there is an authentication user due to isAuthenticated
+    res.send('hello, ' + escapeHtml(req.session.user) + '!' +
+      ' <a href="/login">Logout</a>')
+  })
 
 app.get('/homepage', (req, res) => {
     database.query("SELECT * FROM Blogs", (err, blog) => {
@@ -68,6 +86,7 @@ app.get('/myprofile', (req, res) => {
     });
 });
 
+
 app.get('/settings', (req, res) => {
     res.render('settings');
 });
@@ -91,7 +110,7 @@ app.post('/homepage', async (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', express.urlencoded({ extended: false}),async (req, res) => {
     
     try {
         const {email, password} = req.body;
@@ -136,7 +155,43 @@ app.post('/login', async (req, res) => {
 	catch(err){
     console.log(err);
     }
+     // regenerate the session, which is good practice to help
+  // guard against forms of session fixation
+  req.session.regenerate(function (err) {
+    if (err) next(err)
+
+    // store user information in session, typically a user id
+    req.session.user = req.body.user
+
+    // save the session before redirection to ensure page
+    // load does not happen before session is saved
+    req.session.save(function (err) {
+      if (err) return next(err)
+      res.redirect('/')
+    })
+  })
 });
+
+app.get('/logout', function (req, res, next) {
+    // logout logic
+  
+    // clear the user from the session object and save.
+    // this will ensure that re-using the old session id
+    // does not have a logged in user
+    req.session.user = null
+    req.session.save(function (err) {
+      if (err) next(err)
+  
+      // regenerate the session, which is good practice to help
+      // guard against forms of session fixation
+      req.session.regenerate(function (err) {
+        if (err) next(err)
+        res.redirect('/')
+      })
+    })
+  })
+  
+
 
 app.post('/createaccount', async (req, res) => {
     try {
