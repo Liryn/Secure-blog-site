@@ -27,5 +27,18 @@
 				<a href="/createaccount"> Register</a>
 			</div>
 		</div>
+
+		<div class = "pageTitle">
+			<h1>My Blogs</h1>
+		</div>
+
+		<% blog.forEach(blog => { %>
+			<div class = 'blogList'>
+				<h1 class = 'blogTitle'><%= blog.title %></h1>
+				<p class = 'blogIDs'>User ID: <%= blog.UserID %> 
+				<p class = 'blogIDs'>Post ID: <%= blog.PostID %>
+				<p class = 'blogContent'><%= blog.content %></p>
+			</div>
+			<% }) %>
 	</body>
 </html>
