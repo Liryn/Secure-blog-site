@@ -109,7 +109,6 @@ app.post('/login', async (req, res) => {
 				}
 				else{
 					hash = databaseHash
-					console.log("This is res", databaseHash)
 					callback();
 				}
 			});
@@ -119,11 +118,8 @@ app.post('/login', async (req, res) => {
 			stringPassword = JSON.stringify(hash)
 			hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
 			
-			console.log("The compare hash function is printing: ", hashedPassword);
+			console.log("The hashed function from the database is: ", hashedPassword);
 			console.log("The password the user passed in is: ", password);
-			if(password == hashedPassword){
-				console.log(hash,"IS EQUAL TO", password);
-			}
 				
 			const hashComparison = bcrypt.compare(password, hashedPassword);	
 			
