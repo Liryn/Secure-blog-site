@@ -122,26 +122,19 @@ app.post('/login', async (req, res) => {
 			console.log("The compare hash function is printing: ", hashedPassword);
 			console.log("The password the user passed in is: ", password);
 			if(password == hashedPassword){
-				console.log(hash,"IS EQUAL TO",password);
-		}}
-
-        //console.log(user);
-
-        // const user = await bcrypt.hash('1', 10);
-
-        /*if(user){
-            const check = await bcrypt.compare(password, user.password);
-        
-            if(check){
-                console.log('valid');
+				console.log(hash,"IS EQUAL TO", password);
+			}
+				
+			const hashComparison = bcrypt.compare(password, hashedPassword);	
+			
+			if(hashComparison){
+                console.log('Bcrypt says the passwords match');
                 res.redirect('/makepost');
             }
             else {
-                console.log('invalid');
-            }
-        } else {
-            console.log('no email');
-        }*/
+                console.log('Bcrypt says the passwords do not match');
+            }			
+		}
 		getPassword(compareHash);
     }
 	catch(err){
