@@ -195,43 +195,67 @@ app.get('/logout', function (req, res, next) {
 
 app.post('/createaccount', async (req, res) => {
     try {
+		//Obtain variables from user input in req
         const {fname, lname, email, password} = req.body;
-
-        // Get all emails in the database
-        database.query("SELECT email FROM Users", (err, res) => {
-            if(err) {
-                console.log(err);
-			} 
-			// Check if the user table is empty
-			else if(res.length > 0) {
-            console.log('There are emails');
-            
-				// Turn the res array of emails to one large string, check if the email has an index in the string, if so, it's present
-				if(JSON.stringify(res).indexOf(email) >= 0){
-					console.log("Index is", JSON.stringify(res).indexOf(email));
-					console.log('Email in Use, has been found with the index checker');
+		//Initiate a boolean var, true if email is new, false if it already has been used
+		var newEmail;
+		
+		//Function to check new email against list of existing ones
+		function checkEmail(callback){
+			
+			// Get all emails in the database
+			database.query("SELECT email FROM Users", (err, res) => {
+				if(err) {
+					console.log(err);
 				} 
+				
+				// Check if there are any emails in the database
+				else if(res.length > 0) {
+					
+					// Turn the res array of emails to one large string, check if the email has an index in the string, if so, it's present
+					if(JSON.stringify(res).indexOf(email) >= 0){
+						console.log('Email in Use, has been found with the index checker');
+						newEmail = false;
+					}
+					else{
+						newEmail = true;
+					} 
+				callback();
+				}
+			})
+		}
+		
+		async function processAccount(){
+			//Check if the email already exists
+			if(newEmail == false){
+				console.log("Process of making account is ending, account should not have been added")
+				//Refresh the create accoun page to clear boxes
+				res.render('createaccount')
+				//****Put Alert to client side here****
+				alert('That email has already been registered, please try again')
+				//End the post
+				res.end()
+			}
+			else{
+				//If email is new, create a salt and hash
+				console.log("Email is absolutely fine, it can be added to the database");
+				const salt = await bcrypt.genSalt(10); // Generate salt
+				const hash = await bcrypt.hash(password, salt); // Generate hash
 
-                // Find way to cancel process
-            }
-        })
-
-        if(password < 8){
-            // find way to cancel process as per NIST convention
-        }
-
-        const salt = await bcrypt.genSalt(10); // Generate salt
-        const hash = await bcrypt.hash(password, salt); // Generate hash
-
-        database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
-            if(err){
-                console.log(err);
-            } else {
-                console.log(res);
-                }
-            }
-        console.log("REGISTERED");
-        res.redirect('/login');
+				//Use an SQL inset statement to place the user into the table
+				database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
+					if(err){
+						console.log(err);
+					} else {
+						console.log(res);
+						}
+					}
+				console.log("REGISTERED");
+				res.redirect('/login');
+			}
+			
+		}
+		checkEmail(processAccount);
     } 
     catch(err) {
         console.log(err);
