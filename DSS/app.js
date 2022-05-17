@@ -3,9 +3,28 @@ const mysql = require('mysql');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const JSON = require('JSON');
+const session = require('express-session')
+const path = require('path')
+const url = require('url');
 
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
-const { indexOf, join } = require('lodash');
+const { indexOf } = require('lodash');
+const { request } = require('http');
+const { constants } = require('http2');
+
+
+app = express(); 
+app.set('view engine', 'ejs');
+app.set('views', 'ejs');
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false}));
+app.use(express.json());
+app.use(session({ // Session determines whether the user is logged in or not
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}));
+app.listen(3000);
 
 dotenv.config({path: './db.env'});
 
@@ -21,19 +40,11 @@ database.connect((err) => {
     if(err){
         console.log('mysql connection failed');
     } else {
-    console.log("mysql connected")
+        console.log("mysql connected and hi")
+
     };
 });
 
-const app = express(); 
-app.set('view engine', 'ejs');
-app.set('views', 'ejs');
-
-app.use(express.static('css'));
-app.use(express.urlencoded({ extended: false}));
-app.use(express.json());
-
-app.listen(3000);
 
 app.get('/homepage', (req, res) => {
     const blogs = database.query("SELECT * FROM Blogs", (err, blog) => {
@@ -42,6 +53,13 @@ app.get('/homepage', (req, res) => {
         } else {
             res.render('homepage', {blog});
         }
+    if (req.session.loggedin){
+        // Output email ? or first_name
+        res.send('Welcome back, ' + req.session.email + '!');
+    }else {
+        res.send('Please login to view this page!')
+    }
+    res.end();
     });
 });
 
@@ -68,6 +86,8 @@ app.get('/settings', (req, res) => {
 });
 
 app.post('/homepage', async (req, res) => {
+    console.log("homepage print")
+
     try {
         const {title, content, userid} = req.body;
         console.log(req.body)
@@ -86,47 +106,74 @@ app.post('/homepage', async (req, res) => {
     }
 });
 
+
+app.post('/login', function (req,res){
+    const salt = await bcrypt.genSalt(10); // Generate salt
+    console.log(req)
+    let email = req.body.email;
+    let password = req.body.password;
+    console.log(email,password);
+
+    if (email && password){
+        database.query('SELECT * FROM Users WHERE email = ? AND password = ?', [email, password], function(error, results, fields){
+            if (error){
+                throw error;
+                console.log('wow')
+            } 
+            console.log("omg")
+            // If there is an issue with the query, output the error
+            if (results.length > 0){
+                req.session.loggedin = true;
+                req.session.username = username; // username or email?
+                res.redirect('/homepage');
+            } else {
+                res.send('Incorrect email or password'); // generic response = Account Enumeration   
+        }
+        res.end();
+    
+});
+} else {
+    res.send('Please enter Email and Password')
+}
+});
+
+
+
+/*
 app.post('/login', async (req, res) => {
 
     try {
         const {email, password} = req.body;
 
-        const user = database.query("SELECT password FROM Users WHERE email = ?", [email], (err, res) => {
-            if(err){
-                console.log(err)
-            }
-            else{
-                console.log(res);
-            }
-        });
-        
-        if(user){
-            let check = await bcrypt.compare(password, user.password)
-        
-            if(check){
-                console.log('valid');
-                res.redirect('/makepost');
-            }
-            else {
-                console.log('invalid');
-            }
-        } else {
-            console.log('no email');
+        if(!email){
+            console.log('missing email')
+        } else if(!password){
+            console.log('missing password')
         }
 
-    } catch(err){
+        const hash = database.query("SELECT password FROM Users WHERE email = ? LIMIT 1", [email])
+        console.log(hash);
+
+        if(hash){
+            const check = await bcrypt.compare(password, hash)
+        
+            // if(check == true){
+            //     console.log('valid');
+            //     res.redirect('/makepost');
+            // }
+            // else {
+            //     console.log('invalid');
+            // }
+        } else {
+            console.log('no user found');
+        }
+
+
+} catch(err){
     console.log(err);
-    }
+}
 });
-
-// log = async function(email, password){
-//     const user = await database.query('')
-//     if(user){
-//         await bcrypt.compare(password, user.password);
-//     }
-//     throw Error('Incorrect Email')
-// }
-
+*/
 app.post('/createaccount', async (req, res) => {
     try {
         const {fname, lname, email, password} = req.body;
@@ -154,7 +201,7 @@ app.post('/createaccount', async (req, res) => {
             // find way to cancel process as per NIST convention
         }
 
-        const salt = await bcrypt.genSaltSync(10); // Generate salt
+        const salt = await bcrypt.genSalt(); // Generate salt
         const hash = await bcrypt.hash(password, salt); // Generate hash
 
         database.query("INSERT INTO Users SET ?", {first_name: fname, second_name: lname, email: email, password: hash}), (err, res) =>{
