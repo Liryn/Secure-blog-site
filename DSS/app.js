@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const JSON = require('JSON');
 const bodyParser = require('body-parser');
+const fetch = require("isomorphic-fetch");
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 const { indexOf, join } = require('lodash');
 const { check, validationResult } = require('express-validator');
@@ -32,34 +33,38 @@ database.connect((err) => {
     console.log("mysql connected")
     };
 });
-
+var useremail = "";
 const app = express(); 
 app.set('view engine', 'ejs');
 app.set('views', 'ejs');
 
 app.use(express.static('css'));
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 app.listen(3000);
 
 app.use(session({
     secret: 'keyboard cat',
-    resave: false,
+    resave: true,
     saveUninitialized: true
   }))
 
   function isAuthenticated (req, res, next) {
-    if (req.session.user) next()
+    if (useremail) next()
     else next('route')
   }
-  app.get('/', isAuthenticated, function (req, res) {
+  
+  app.get('/welcomepage', isAuthenticated, function (req, res) {
     // this is only called when there is an authentication user due to isAuthenticated
-    res.send('hello, ' + escapeHtml(req.session.user) + '!' +
-      ' <a href="/login">Logout</a>')
+    res.send('hello, ' + escapeHtml(useremail) + '!' +
+      ' <a href="/myprofile">Welcome</a>')
   })
+  
 
-app.get('/homepage', (req, res) => {
+app.get('/homepage', function(req, res) {
+    // If the user is loggedin
+    
     database.query("SELECT * FROM Blogs", (err, blog) => {
         if(err){
             console.log(err);
@@ -140,9 +145,18 @@ app.post('/homepage', makePostSanitizer, async (req, res) => {
     }
 });
 
+app.post('/validate', async (req, res) => {
+	const secret_key = "6LeCKfsfAAAAAM4X7AtaonmGY2knJ_S0MUMC-zZI";
+    const token = req.body.token;
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${token}`;
 
-
-
+    fetch(url, {
+        method: 'post'
+    })
+        .then(response => response.json())
+        .then(google_response => res.json({ google_response }))
+        .catch(error => res.json({ error }));
+});
 
 // Sanitisation
 var loginSanitizer = [
@@ -152,7 +166,7 @@ var loginSanitizer = [
 	check('password').trim().escape()];
 	
 app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async (req, res) => {
-    
+
     try {
 		
 		const errors = validationResult(req);
@@ -197,7 +211,29 @@ app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async 
 						}
 					});
 				}
-			}
+			});
+		}
+       
+        req.session.regenerate(function (err) {
+            if (err) next(err)
+        
+            // store user information in session, typically a user id
+            req.session.user = req.body.email
+            useremail = req.session.user
+            // save the session before redirection to ensure page
+            // load does not happen before session is saved
+            req.session.save(function (err) {
+              if (err) return next(err)
+              //res.redirect('/homepage')
+              console.log("session saved")
+              console.log("saved session username is: " + useremail)
+            })
+          })
+		
+		async function compareHash() {
+			stringPassword = JSON.stringify(hash)
+			hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
+
 			
 			async function compareHash() {
 				stringPassword = JSON.stringify(hash)
@@ -208,37 +244,23 @@ app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async 
 					
 				const hashComparison = await bcrypt.compare(password, hashedPassword);	
 
-				console.log(hashComparison);
-				
-				if(hashComparison){
-					console.log('Bcrypt says the passwords match');
-					res.redirect('/myprofile');
-				}
-				else {
-					console.log('Bcrypt says the passwords do not match');
-				}			
-			}
-			getPassword(compareHash);
-		}		
+            console.log(hashComparison);
+			
+			if(hashComparison){
+                console.log('Bcrypt says the passwords match');
+                res.redirect('/welcomepage');
+            }
+            else {
+                console.log('Bcrypt says the passwords do not match');
+            }			
+		}
+		getPassword(compareHash);
+
     }
 	catch(err){
     console.log(err);
     }
-     // regenerate the session, which is good practice to help
-  // guard against forms of session fixation
-  req.session.regenerate(function (err) {
-    if (err) next(err)
-
-    // store user information in session, typically a user id
-    req.session.user = req.body.user
-
-    // save the session before redirection to ensure page
-    // load does not happen before session is saved
-    req.session.save(function (err) {
-      if (err) return next(err)
-      res.redirect('/')
-    })
-  })
+    
 });
 
 app.get('/logout', function (req, res, next) {
@@ -388,3 +410,22 @@ app.post('/createaccount', createAccountSanitizer, async (req, res) => {
         console.log(err);
     }
 });
+
+app.get('/logout', function (req, res, next) {
+  // logout logic
+
+  // clear the user from the session object and save.
+  // this will ensure that re-using the old session id
+  // does not have a logged in user
+  req.session.user = null
+  req.session.save(function (err) {
+    if (err) next(err)
+
+    // regenerate the session, which is good practice to help
+    // guard against forms of session fixation
+    req.session.regenerate(function (err) {
+      if (err) next(err)
+      res.redirect('/')
+    })
+  })
+})
