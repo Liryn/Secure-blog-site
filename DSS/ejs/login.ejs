@@ -6,6 +6,9 @@
 	function getResult(text) {
 		var obj = text.substring(19, text.length - 1);
 		var json = JSON.parse(obj);
+		document.querySelector('#result1').innerHTML = "Recaptcha v3 score of:";
+		document.querySelector('#result2').innerHTML = json.score;
+
         return json.score;
     }
 	function validateCaptcha(){
@@ -30,10 +33,10 @@
 			});
 		});
 		if (getResult < 0.3) {
-			document.querySelector('#result').innerHTML = "Captcha Invalid, login prohibited";
+			document.querySelector('#result3').innerHTML = "Captcha Invalid, login prohibited";
 			return false
 		} else {
-			document.querySelector('#result').innerHTML = "Captcha Valid, logging in";
+			document.querySelector('#result3').innerHTML = "Captcha Valid, logging in";
 			return true;
 		}
 	}
@@ -78,8 +81,15 @@
 				<input type="password" id="password" name="password" required>
 				<input type="submit" value="Login" id="loginButton">
 			</form> 
-			<div id="result" ></div>
-			<div class="g-recaptcha" data-sitekey="6Lc-0fkfAAAAAJ306n4S6I2lBCaoQnvsMJK1wRdb"></div>
+			<div>
+				<small>This site is protected by reCAPTCHA and the Google 
+				<a href="https://policies.google.com/privacy">Privacy Policy</a> and
+				<a href="https://policies.google.com/terms">Terms of Service</a> apply.
+				</small>
+			</div>
+			<div id="result1" ></div>
+			<div id="result2" ></div>
+			<div id="result3" ></div>
 		</div>
 	</body>
 </html>
