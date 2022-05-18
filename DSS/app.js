@@ -5,10 +5,11 @@ const dotenv = require('dotenv');
 const JSON = require('JSON');
 const bodyParser = require('body-parser');
 const fetch = require("isomorphic-fetch");
-
-
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 const { indexOf, join } = require('lodash');
+
+var escapeHtml = require('escape-html')
+var session = require('express-session')
 
 dotenv.config({path: './db.env'});
 
@@ -27,18 +28,38 @@ database.connect((err) => {
     console.log("mysql connected")
     };
 });
-
+var useremail = "";
 const app = express(); 
 app.set('view engine', 'ejs');
 app.set('views', 'ejs');
 
 app.use(express.static('css'));
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
 
 app.listen(3000);
 
-app.get('/homepage', (req, res) => {
+app.use(session({
+    secret: 'keyboard cat',
+    resave: true,
+    saveUninitialized: true
+  }))
+
+  function isAuthenticated (req, res, next) {
+    if (useremail) next()
+    else next('route')
+  }
+  
+  app.get('/welcomepage', isAuthenticated, function (req, res) {
+    // this is only called when there is an authentication user due to isAuthenticated
+    res.send('hello, ' + escapeHtml(useremail) + '!' +
+      ' <a href="/myprofile">Welcome</a>')
+  })
+  
+
+app.get('/homepage', function(req, res) {
+    // If the user is loggedin
+    
     database.query("SELECT * FROM Blogs", (err, blog) => {
         if(err){
             console.log(err);
@@ -69,6 +90,7 @@ app.get('/myprofile', (req, res) => {
         }
     });
 });
+
 
 app.get('/settings', (req, res) => {
     res.render('settings');
@@ -104,10 +126,9 @@ app.post('/validate', async (req, res) => {
         .then(response => response.json())
         .then(google_response => res.json({ google_response }))
         .catch(error => res.json({ error }));
-	
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', express.urlencoded({ extended: false}),async (req, res) => {
     try {
         const {email, password} = req.body;
 		
@@ -126,6 +147,22 @@ app.post('/login', async (req, res) => {
 				}
 			});
 		}
+       
+        req.session.regenerate(function (err) {
+            if (err) next(err)
+        
+            // store user information in session, typically a user id
+            req.session.user = req.body.email
+            useremail = req.session.user
+            // save the session before redirection to ensure page
+            // load does not happen before session is saved
+            req.session.save(function (err) {
+              if (err) return next(err)
+              //res.redirect('/homepage')
+              console.log("session saved")
+              console.log("saved session username is: " + useremail)
+            })
+          })
 		
 		async function compareHash() {
 			stringPassword = JSON.stringify(hash)
@@ -140,7 +177,7 @@ app.post('/login', async (req, res) => {
 			
 			if(hashComparison){
                 console.log('Bcrypt says the passwords match');
-                res.redirect('/myprofile');
+                res.redirect('/welcomepage');
             }
             else {
                 console.log('Bcrypt says the passwords do not match');
@@ -151,6 +188,7 @@ app.post('/login', async (req, res) => {
 	catch(err){
     console.log(err);
     }
+    
 });
 
 app.post('/createaccount', async (req, res) => {
@@ -197,3 +235,22 @@ app.post('/createaccount', async (req, res) => {
         console.log(err);
     }
 });
+
+app.get('/logout', function (req, res, next) {
+  // logout logic
+
+  // clear the user from the session object and save.
+  // this will ensure that re-using the old session id
+  // does not have a logged in user
+  req.session.user = null
+  req.session.save(function (err) {
+    if (err) next(err)
+
+    // regenerate the session, which is good practice to help
+    // guard against forms of session fixation
+    req.session.regenerate(function (err) {
+      if (err) next(err)
+      res.redirect('/')
+    })
+  })
+})
