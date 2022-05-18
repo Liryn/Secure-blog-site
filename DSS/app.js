@@ -211,7 +211,7 @@ app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async 
 						}
 					});
 				}
-			});
+			};
 		}
        
         req.session.regenerate(function (err) {
@@ -257,6 +257,7 @@ app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async 
 		getPassword(compareHash);
 
     }
+}
 	catch(err){
     console.log(err);
     }
