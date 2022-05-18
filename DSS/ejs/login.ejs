@@ -32,12 +32,13 @@
 			<form name="loginForm" action="/login" method="POST">
 
 				<h4>(*) Required Fields</h4>
-
+				
 				<label for="email">Email: *</label>
-				<input type="text" id="email" name="email" required>
-
-				<label for="password">Password: *</label><br>
-				<input type="password" id="password" name="password" required>
+				<input type="email" id="email" name="email" required>
+				
+				<label for="password">Password: *</label>
+				<input type="password" id="password" name="password" minlength="8" required>
+				
 				<input type="submit" value="Login">
 			</form> 
 
