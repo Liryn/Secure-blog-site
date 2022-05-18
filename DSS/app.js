@@ -13,7 +13,7 @@ const { check, validationResult } = require('express-validator');
 var escapeHtml = require('escape-html')
 var session = require('express-session')
 var alert = require('alert');
-var he = require('he');
+
 
 
 dotenv.config({path: './db.env'});
