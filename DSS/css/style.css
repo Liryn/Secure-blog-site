@@ -175,3 +175,7 @@ input[type=submit]:hover {
   background-color: #5b5a57;
   color: #eae7dc;
 }
+/*Recaptcha floating logo */
+.g-recaptcha {
+  float: right;
+}

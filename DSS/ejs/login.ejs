@@ -1,5 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+	<script src="https://www.google.com/recaptcha/api.js?render=6LeCKfsfAAAAAAvvZoyqwwUlmqEN_qEYBLSzooYH"></script>
+	<script>
+	function getResult(text) {
+		var obj = text.substring(19, text.length - 1);
+		var json = JSON.parse(obj);
+        return json.score;
+    }
+	function validateCaptcha(){
+		grecaptcha.ready(function() {
+			grecaptcha.execute('6LeCKfsfAAAAAAvvZoyqwwUlmqEN_qEYBLSzooYH', {action: 'login'})
+            .then(function(token) {
+				var data = {
+					token: token
+				};
+
+				fetch('/validate', {
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json'
+					},
+					method: 'post',
+					body: JSON.stringify(data)
+				})
+					.then(response => response.text())
+					.then(text => getResult(text))
+					.catch(error => getResult(error));
+			});
+		});
+		if (getResult < 0.3) {
+			document.querySelector('#result').innerHTML = "Captcha Invalid, login prohibited";
+			return false
+		} else {
+			document.querySelector('#result').innerHTML = "Captcha Valid, logging in";
+			return true;
+		}
+	}
+	</script>
+
 
 	<head>
 		<meta charset="utf-8" />
@@ -29,18 +68,18 @@
 		</div>
            
 		<div class ="post"> 
-			<form name="loginForm" action="/login" method="POST">
+			<form name="loginForm" action="/login" method="POST" onsubmit="return validateCaptcha()">
 
 				<h4>(*) Required Fields</h4>
 
 				<label for="email">Email: *</label>
 				<input type="text" id="email" name="email" required>
-
 				<label for="password">Password: *</label><br>
 				<input type="password" id="password" name="password" required>
-				<input type="submit" value="Login">
+				<input type="submit" value="Login" id="loginButton">
 			</form> 
-
+			<div id="result" ></div>
+			<div class="g-recaptcha" data-sitekey="6Lc-0fkfAAAAAJ306n4S6I2lBCaoQnvsMJK1wRdb"></div>
 		</div>
 	</body>
 </html>

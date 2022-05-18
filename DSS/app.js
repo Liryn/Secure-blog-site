@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 const JSON = require('JSON');
 const bodyParser = require('body-parser');
+const fetch = require("isomorphic-fetch");
 const { parseUrl } = require('mysql/lib/ConnectionConfig');
 const { indexOf, join } = require('lodash');
 
@@ -114,8 +115,20 @@ app.post('/homepage', async (req, res) => {
     }
 });
 
+app.post('/validate', async (req, res) => {
+	const secret_key = "6LeCKfsfAAAAAM4X7AtaonmGY2knJ_S0MUMC-zZI";
+    const token = req.body.token;
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${token}`;
+
+    fetch(url, {
+        method: 'post'
+    })
+        .then(response => response.json())
+        .then(google_response => res.json({ google_response }))
+        .catch(error => res.json({ error }));
+});
+
 app.post('/login', express.urlencoded({ extended: false}),async (req, res) => {
-    
     try {
         const {email, password} = req.body;
 		
