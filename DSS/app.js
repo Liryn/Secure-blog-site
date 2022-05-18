@@ -102,17 +102,8 @@ app.get('/settings', (req, res) => {
     res.render('settings');
 });
 
-
-
-
-
-// Sanitisation
-var makePostSanitizer = [
-    //Sanitizes Password
-	check('content').escape()
-	];
 	
-app.post('/homepage', makePostSanitizer, async (req, res) => {
+app.post('/homepage', async (req, res) => {
     try {
         const {title, content, userid} = req.body;
 
