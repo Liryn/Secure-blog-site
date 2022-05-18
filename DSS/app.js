@@ -12,6 +12,7 @@ const { check, validationResult } = require('express-validator');
 var escapeHtml = require('escape-html')
 var session = require('express-session')
 var alert = require('alert');
+var he = require('he');
 
 
 dotenv.config({path: './db.env'});
@@ -85,6 +86,7 @@ app.get('/myprofile', (req, res) => {
         if(err){
             console.log(err);
         } else {
+			console.log(blog)
             res.render('myprofile', {blog});
         }
     });
@@ -95,93 +97,129 @@ app.get('/settings', (req, res) => {
     res.render('settings');
 });
 
-app.post('/homepage', async (req, res) => {
+
+
+
+
+// Sanitisation
+var makePostSanitizer = [
+    //Sanitizes Password
+	check('content').escape()
+	];
+	
+app.post('/homepage', makePostSanitizer, async (req, res) => {
     try {
         const {title, content, userid} = req.body;
-        console.log(req.body)
-		//Ignore User ID as it should be taken automatically
-        database.query("INSERT INTO Blogs SET ?", {title: title, content: content, UserID: userid}), (err, res) => {
-            // redirect fix
-            if(err){
-                console.log(err);
-            } else {
-                console.log(res)
-            }
-        }
-        res.redirect('/homepage')
+
+		//This regex accepts (a-z, A-Z, 0-9) and white spaces, no punctuation or special characters
+		if (!title.match(/^[a-zA-Z0-9\s]+$/)){
+			console.log("Title is in unacceptable format")
+			
+			//Refresh the create account page to clear boxes
+			res.render('makepost')
+
+			alert('To input Title, please do not use special characters or punctuation')
+			//End the post
+			res.end()
+		}
+		else{
+			//Ignore User ID as it should be taken automatically
+			database.query("INSERT INTO Blogs SET ?", {title: title, content: content, UserID: userid}), (err, res) => {
+				// redirect fix
+				if(err){
+					console.log(err);
+				} else {
+					console.log(res)
+				}
+			}
+			res.redirect('/homepage')
+		}
     } 
     catch(err) {
         console.log(err);
     }
 });
 
-app.post('/login', express.urlencoded({ extended: false}),async (req, res) => {
+
+
+
+
+// Sanitisation
+var loginSanitizer = [
+	//Validates and Sanitizes Email
+	check('email').isEmail().trim().escape().normalizeEmail(),
+    //Sanitizes Password
+	check('password').trim().escape()];
+	
+app.post('/login', loginSanitizer, express.urlencoded({ extended: false}),async (req, res) => {
     
     try {
-        const {email, password} = req.body;
 		
-		var hash;
-		
-		function getPassword(callback) {
-			
-			//This regex accepts (a-z, A-Z, 0-9), then 1 "@" for the email, then (a-z, A-Z and ".")
-			if (!email.match(/^[a-zA-Z0-9]+\@{1}[a-zA-Z/.]+$/)){
-				console.log("Email is in unacceptable format")
-				
-				//Refresh the create account page to clear boxes
-				res.render('login')
-
-				//alert('For Email please do not use any special characters, apart from the "@" and "." in your email address')
-				//End the post
-				res.end()
-			}
-			// This regex accepts everything except "=", "'", '"' and ";"
-			// NEED TO SANITISE THIS INSTEAD
-			else if (!password.match(/^[^\=\'\"\;\<\>]+$/)){
-				console.log("Password is in unacceptable format")
-				
-				//Refresh the create account page to clear boxes
-				res.render('login')
-
-				//alert("For Password please do not use any of the following characters; (=), ('), (\"), (;), (<), (>)")
-				//End the post
-				res.end()
-			}
-			
-			else{
-				database.query("SELECT password FROM Users WHERE email = ?", email, (err, databaseHash) => {
-					if(err){
-						console.log(err);
-					}
-					else{
-						hash = databaseHash
-						
-						callback();
-					}
-				});
-			}
+		const errors = validationResult(req);
+		//Any Errors will come from isEmail() and so means not inputted valid email
+		if (!errors.isEmpty()) {
+			res.render('login')
+			alert('To input Email, please do not use special characters. Format email such as: "Example10@gmail.com"')
+			//End the post
+			res.end()
 		}
+		else {
 		
-		async function compareHash() {
-			stringPassword = JSON.stringify(hash)
-			hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
+			const {email, password} = req.body;
 			
-			console.log("The hashed function from the database is: ", hashedPassword);
-			console.log("The password the user passed in is: ", password);
+			var hash;
+			
+			function getPassword(callback) {
 				
-			const hashComparison = await bcrypt.compare(password, hashedPassword);	
+				//This regex accepts (a-z, A-Z, 0-9), then 1 "@" for the email, then (a-z, A-Z and ".")
+				if (!email.match(/^[a-zA-Z0-9]+\@{1}[a-zA-Z/.]+$/)){
+					console.log("Email is in unacceptable format")
+					
+					//Refresh the create account page to clear boxes
+					res.render('login')
 
-            console.log(hashComparison);
+					alert('To input Email, please do not use special characters. Format email such as: "Example10@gmail.com"')
+					//End the post
+					res.end()
+				}
+				else{
+					console.log("Email after sanitization: ", email)
+					console.log("Password after sanitization: ", password)
+					
+					database.query("SELECT password FROM Users WHERE email = ?", email, (err, databaseHash) => {
+						if(err){
+							console.log(err);
+						}
+						else{
+							hash = databaseHash
+							
+							callback();
+						}
+					});
+				}
+			}
 			
-			if(hashComparison){
-                console.log('Bcrypt says the passwords match');
-                res.redirect('/myprofile');
-            }
-            else {
-                console.log('Bcrypt says the passwords do not match');
-            }			
-		}
-		getPassword(compareHash);
+			async function compareHash() {
+				stringPassword = JSON.stringify(hash)
+				hashedPassword = stringPassword.slice(stringPassword.indexOf("password")+11, stringPassword.indexOf("}")-1)
+				
+				console.log("The hashed function from the database is: ", hashedPassword);
+				console.log("The password the user passed in is: ", password);
+					
+				const hashComparison = await bcrypt.compare(password, hashedPassword);	
+
+				console.log(hashComparison);
+				
+				if(hashComparison){
+					console.log('Bcrypt says the passwords match');
+					res.redirect('/myprofile');
+				}
+				else {
+					console.log('Bcrypt says the passwords do not match');
+				}			
+			}
+			getPassword(compareHash);
+		}		
     }
 	catch(err){
     console.log(err);
@@ -223,13 +261,15 @@ app.get('/logout', function (req, res, next) {
   })
   
 
+
+
+
 // Sanitisation
 var createAccountSanitizer = [
 	//Validates and Sanitizes Email
 	check('email').isEmail().trim().escape().normalizeEmail(),
     //Sanitizes Password
 	check('password').trim().escape()];
-  
   
 app.post('/createaccount', createAccountSanitizer, async (req, res) => {
     try {
@@ -284,7 +324,6 @@ app.post('/createaccount', createAccountSanitizer, async (req, res) => {
 					//End the post
 					res.end()
 				}
-				// This regex finds all special characters except for "_"
 				else {
 					console.log("Email after sanitization: ", email)
 					console.log("Password after sanitization: ", password)
